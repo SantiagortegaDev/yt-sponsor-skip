@@ -1,0 +1,220 @@
+/* ============================================================
+   popup.css — Estilos del popup de YT Sponsor Skip
+   Inspirado en YouTube: fondo oscuro, texto blanco, acentos rojos
+   ============================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+  background: #0f0f0f;
+  color: #f1f1f1;
+}
+
+.popup-container {
+  padding: 0;
+}
+
+/* --- Header --- */
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  background: #ff0000;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.popup-version {
+  font-size: 11px;
+  color: #717171;
+}
+
+/* --- Body --- */
+.popup-body {
+  padding: 16px 20px;
+}
+
+.popup-warning {
+  background: rgba(255, 204, 0, 0.1);
+  border: 1px solid rgba(255, 204, 0, 0.3);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #ffcc00;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.popup-section {
+  margin-bottom: 18px;
+}
+
+.popup-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.popup-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f1f1;
+  padding: 10px 42px 10px 14px;
+  border-radius: 6px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.popup-input:focus {
+  outline: none;
+  border-color: #ff0000;
+}
+
+.popup-input::placeholder {
+  color: #555;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.toggle-btn:hover {
+  color: #fff;
+}
+
+.popup-status {
+  font-size: 12px;
+  margin-top: 6px;
+  padding-left: 2px;
+}
+
+.popup-status-ok {
+  color: #2dbd2d;
+}
+
+.popup-status-error {
+  color: #ff4444;
+}
+
+/* --- Actions --- */
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #ff0000;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #cc0000;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f1f1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Test Result --- */
+.popup-test-result {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.test-success {
+  background: rgba(45, 189, 45, 0.1);
+  border: 1px solid rgba(45, 189, 45, 0.3);
+  color: #2dbd2d;
+}
+
+.test-error {
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #ff4444;
+}
+
+/* --- Footer --- */
+.popup-footer {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  color: #717171;
+}
+
+.popup-footer strong {
+  color: #aaa;
+}

@@ -1,0 +1,54 @@
+name: Build Extension ZIP
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create extension ZIP
+        run: |
+          zip -r yt-sponsor-skip.zip \
+            manifest.json \
+            background.js \
+            content.js \
+            content.css \
+            popup.html \
+            popup.js \
+            popup.css \
+            icons/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yt-sponsor-skip-extension
+          path: yt-sponsor-skip.zip
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(node -e "console.log(require('./manifest.json').version)")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: YT Sponsor Skip v${{ steps.version.outputs.version }}
+          body: |
+            ## YT Sponsor Skip v${{ steps.version.outputs.version }}
+            Extensión para Firefox y Chrome que detecta y salta sponsors automáticamente.
+            ### Instalación en Firefox
+            1. Descarga el `.zip`
+            2. Ve a `about:debugging` → "Este Firefox"
+            3. Haz clic en "Cargar complemento temporal" y selecciona el ZIP
+          files: yt-sponsor-skip.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Sponsor Skip — Configuración</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="popup-logo">
+        <span class="logo-icon">▶</span>
+        <span class="logo-text">YT Sponsor Skip</span>
+      </div>
+      <div class="popup-version">v1.0.0</div>
+    </div>
+
+    <div class="popup-body">
+      <div class="popup-warning">
+        ⚠️ Esta extensión envía la transcripción del video a Groq para detectar sponsors.
+      </div>
+
+      <div class="popup-section">
+        <label class="popup-label" for="api-key-input">Groq API Key</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="api-key-input"
+            class="popup-input"
+            placeholder="gsk_..."
+            autocomplete="off"
+          />
+          <button id="toggle-visibility" class="toggle-btn" title="Mostrar/ocultar">👁</button>
+        </div>
+        <div id="api-key-status" class="popup-status">API Key no configurada</div>
+      </div>
+
+      <div class="popup-actions">
+        <button id="save-btn" class="btn btn-primary">Guardar</button>
+        <button id="test-btn" class="btn btn-secondary">Probar conexión</button>
+      </div>
+
+      <div id="test-result" class="popup-test-result" style="display: none;"></div>
+    </div>
+
+    <div class="popup-footer">
+      <span>Modelo: <strong>llama-3.3-70b-versatile</strong></span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
