@@ -70,10 +70,10 @@ function validateSponsors(sponsors, transcript) {
       return false;
     }
 
-    // Verificar que los timestamps existen en la transcripción (±5 segundos de tolerancia)
+    // Verificar que los timestamps existen en la transcripción (±16 segundos de tolerancia para soportar bloques agrupados)
     const transcriptTimes = transcript.map(t => t.time);
-    const startNear = transcriptTimes.some(t => Math.abs(t - sponsor.start) <= 5);
-    const endNear = transcriptTimes.some(t => Math.abs(t - sponsor.end) <= 5);
+    const startNear = transcriptTimes.some(t => Math.abs(t - sponsor.start) <= 16);
+    const endNear = transcriptTimes.some(t => Math.abs(t - sponsor.end) <= 16);
 
     if (!startNear || !endNear) {
       console.warn('[YT-Skip] Sponsor descartado: timestamps no encontrados en transcripción', sponsor);

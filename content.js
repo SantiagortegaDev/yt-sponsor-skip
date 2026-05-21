@@ -189,94 +189,122 @@ async function scrapeTranscript() {
   try {
     console.log('[YT-Skip] Iniciando scraping de transcripción...');
 
-    // Paso 1: Click en el botón "..." (más opciones) debajo del video
-    // YouTube cambia frecuentemente sus selectores, usamos múltiples fallbacks
-    const moreButton =
-      document.querySelector('#top-level-buttons-computed ytd-button-renderer:last-of-type button') ||
-      document.querySelector('button[aria-label="More actions"]') ||
-      document.querySelector('button[aria-label="Más acciones"]') ||
-      document.querySelector('#menu button yt-icon-button button') ||
-      document.querySelector('#top-level-buttons ytd-button-renderer:last-of-type button') ||
-      document.querySelector('ytd-menu-renderer button:last-of-type');
-
-    if (moreButton) {
-      moreButton.click();
-    } else {
-      // Intentar buscar por el selector de los tres puntos
-      const actionMenu = document.querySelector('#top-level-buttons-computed') ||
-                         document.querySelector('#top-level-buttons');
-      if (actionMenu) {
-        const buttons = actionMenu.querySelectorAll('button');
-        if (buttons.length > 0) {
-          buttons[buttons.length - 1].click();
-        } else {
-          throw new Error('No se encontró el botón de más opciones');
-        }
-      } else {
-        throw new Error('No se encontró el menú de acciones');
-      }
-    }
-
-    // Esperar a que el menú se abra
-    await new Promise(r => setTimeout(r, 500));
-
-    // Paso 2: Click en "Mostrar transcripción" / "Show transcript"
-    // Buscar por múltiples selectores y textos en varios idiomas
-    const menuItems = document.querySelectorAll(
-      'ytd-menu-popup-renderer tp-yt-paper-listbox ytd-menu-service-item-renderer, ' +
-      'ytd-menu-popup-renderer ytd-menu-service-item-renderer'
-    );
-
     let transcriptButton = null;
-    for (const item of menuItems) {
-      const text = item.textContent.trim().toLowerCase();
-      // Buscar por múltiples idiomas y variantes
-      if (text.includes('transcript') || text.includes('transcripción') ||
-          text.includes('transcrição') || text.includes('trascrizione') ||
-          text.includes('transkript') || text.includes('transkription')) {
-        transcriptButton = item;
-        break;
+
+    console.log('[YT-Skip] Buscando botón de transcripción...');
+    // Intentar buscar el botón durante un máximo de 6 segundos (12 intentos, 500ms entre cada uno)
+    for (let attempt = 0; attempt < 12; attempt++) {
+      // Método 1: Intentar buscar el botón directo de transcripción en la descripción
+      const descriptionContainer = document.querySelector('#description') || 
+                                   document.querySelector('#description-inline-expander') ||
+                                   document.querySelector('ytd-watch-metadata') ||
+                                   document.querySelector('#primary-inner');
+      if (descriptionContainer) {
+        const buttons = descriptionContainer.querySelectorAll('button');
+        for (const btn of buttons) {
+          const txt = btn.textContent.trim().toLowerCase();
+          if ((txt.includes('transcripción') || txt.includes('transcript') || 
+               txt.includes('transkript') || txt.includes('transcription')) &&
+              !btn.classList.contains('yt-skip-transcript-btn')) {
+            transcriptButton = btn;
+            console.log('[YT-Skip] Botón directo de transcripción encontrado en la descripción');
+            break;
+          }
+        }
       }
+
+      // Si no lo encontramos en la descripción, buscar en todo el documento (excluyendo el nuestro)
+      if (!transcriptButton) {
+        const allButtons = document.querySelectorAll('button');
+        for (const btn of allButtons) {
+          const txt = btn.textContent.trim().toLowerCase();
+          if ((txt.includes('transcripción') || txt.includes('transcript') || 
+               txt.includes('transkript') || txt.includes('transcription')) &&
+              !btn.classList.contains('yt-skip-transcript-btn')) {
+            transcriptButton = btn;
+            console.log('[YT-Skip] Botón de transcripción encontrado por texto en el documento');
+            break;
+          }
+        }
+      }
+
+      if (transcriptButton) break;
+      await new Promise(r => setTimeout(r, 500));
     }
 
+    // Método 2 (Fallback): Buscar el menú de tres puntos si no hay botón directo tras el periodo de espera
     if (!transcriptButton) {
-      // Fallback: buscar por path del icono de transcripción
-      transcriptButton = document.querySelector(
-        'ytd-menu-service-item-renderer[role="menuitem"]:last-of-type'
-      );
-    }
+      console.log('[YT-Skip] Botón directo no encontrado tras esperar. Probando con el menú de tres puntos...');
+      const moreButton =
+        document.querySelector('#top-level-buttons-computed ytd-button-renderer:last-of-type button') ||
+        document.querySelector('button[aria-label="More actions"]') ||
+        document.querySelector('button[aria-label="Más acciones"]') ||
+        document.querySelector('#menu button yt-icon-button button') ||
+        document.querySelector('#top-level-buttons ytd-button-renderer:last-of-type button') ||
+        document.querySelector('ytd-menu-renderer button:last-of-type');
 
-    if (!transcriptButton) {
-      // Fallback adicional: buscar por el path SVG del icono de transcripción
-      const allMenuItems = document.querySelectorAll('ytd-menu-service-item-renderer');
-      for (const item of allMenuItems) {
-        const path = item.querySelector('path[d*="M4"]'); // Icono de lista/transcripción
-        if (path) {
-          transcriptButton = item;
-          break;
+      if (moreButton) {
+        moreButton.click();
+        // Esperar a que el menú se abra
+        await new Promise(r => setTimeout(r, 500));
+
+        // Buscar en los items del menú popup
+        const menuItems = document.querySelectorAll(
+          'ytd-menu-popup-renderer tp-yt-paper-listbox ytd-menu-service-item-renderer, ' +
+          'ytd-menu-popup-renderer ytd-menu-service-item-renderer'
+        );
+
+        for (const item of menuItems) {
+          const text = item.textContent.trim().toLowerCase();
+          if (text.includes('transcript') || text.includes('transcripción') ||
+              text.includes('transcrição') || text.includes('trascrizione') ||
+              text.includes('transkript') || text.includes('transkription')) {
+            transcriptButton = item;
+            break;
+          }
+        }
+
+        if (!transcriptButton) {
+          // Fallback: buscar por path del icono de transcripción
+          transcriptButton = document.querySelector(
+            'ytd-menu-service-item-renderer[role="menuitem"]:last-of-type'
+          );
+        }
+
+        if (!transcriptButton) {
+          // Fallback adicional: buscar por el path SVG del icono de transcripción
+          const allMenuItems = document.querySelectorAll('ytd-menu-service-item-renderer');
+          for (const item of allMenuItems) {
+            const path = item.querySelector('path[d*="M4"]'); // Icono de lista/transcripción
+            if (path) {
+              transcriptButton = item;
+              break;
+            }
+          }
         }
       }
     }
 
     if (!transcriptButton) {
-      // Cerrar el menú si no encontramos la opción
+      // Intentar cerrar el menú por si acaso
       document.body.click();
-      throw new Error('Este video no tiene transcripción disponible.');
+      throw new Error('Este video no tiene transcripción disponible o no se pudo encontrar el botón.');
     }
 
+    // Hacer clic en el botón para abrir el panel
     transcriptButton.click();
 
     // Paso 3: Esperar a que el panel de transcripción se cargue
     await new Promise(r => setTimeout(r, 1500));
 
     // Esperar los segmentos de transcripción
-    const transcriptPanel = await waitForElement('ytd-transcript-renderer', 8000).catch(() => null);
+    const transcriptPanel = await waitForElement('ytd-transcript-renderer, ytd-transcript-search-panel-renderer, #segments-container', 8000).catch(() => null);
     if (!transcriptPanel) {
       throw new Error('No se pudo cargar el panel de transcripción.');
     }
 
     // Esperar los segmentos individuales
-    await waitForElement('ytd-transcript-segment-renderer', 5000).catch(() => null);
+    await waitForElement('ytd-transcript-segment-renderer, ytd-transcript-segment-list-renderer', 5000).catch(() => null);
 
     // Paso 4: Extraer bloques de texto con timestamps
     const segments = document.querySelectorAll('ytd-transcript-segment-renderer');
@@ -301,7 +329,11 @@ async function scrapeTranscript() {
     // Paso 5: Cerrar el panel de transcripción
     const closeButton = document.querySelector('ytd-transcript-renderer button[aria-label="Close transcript"]') ||
                         document.querySelector('ytd-transcript-renderer button[aria-label="Cerrar transcripción"]') ||
-                        document.querySelector('ytd-transcript-renderer #header button');
+                        document.querySelector('ytd-transcript-renderer #header button') ||
+                        document.querySelector('ytd-transcript-search-panel-renderer button[aria-label="Close transcript"]') ||
+                        document.querySelector('ytd-transcript-search-panel-renderer button[aria-label="Cerrar transcripción"]') ||
+                        document.querySelector('ytd-transcript-search-panel-renderer #header button') ||
+                        document.querySelector('ytd-transcript-search-panel-renderer button');
 
     if (closeButton) {
       closeButton.click();
@@ -335,8 +367,27 @@ async function analyzeWithGroq(transcript) {
     return { sponsors: [], has_sponsors: false };
   }
 
+  // Agrupar segmentos de la transcripción en bloques de ~15 segundos para reducir drásticamente el uso de tokens (TPM)
+  const compressedSegments = [];
+  let currentSegment = null;
+
+  for (const seg of transcript) {
+    if (!currentSegment) {
+      currentSegment = { time: seg.time, text: seg.text };
+    } else if (seg.time - currentSegment.time < 15) {
+      currentSegment.text += " " + seg.text;
+    } else {
+      compressedSegments.push(currentSegment);
+      currentSegment = { time: seg.time, text: seg.text };
+    }
+  }
+  if (currentSegment) {
+    compressedSegments.push(currentSegment);
+  }
+
   // Construir texto de transcripción en formato "tiempo|texto"
-  const transcriptText = transcript.map(seg => `${seg.time}|${seg.text}`).join('\n');
+  const transcriptText = compressedSegments.map(seg => `${Math.round(seg.time)}|${seg.text}`).join('\n');
+  console.log(`[YT-Skip] Transcripción comprimida para la API de Groq: de ${transcript.length} a ${compressedSegments.length} líneas`);
 
   try {
     state.isAnalyzing = true;
@@ -387,9 +438,9 @@ function createSkipButton() {
 function showSkipButton(sponsor) {
   removeSkipButton();
 
-  const playerContainer = document.querySelector('.html5-video-container') ||
-                          document.querySelector('#movie_player') ||
-                          document.querySelector('ytd-player');
+  const playerContainer = document.querySelector('#movie_player') ||
+                          document.querySelector('ytd-player') ||
+                          document.querySelector('.html5-video-container');
 
   if (!playerContainer) return;
 
@@ -443,9 +494,9 @@ function skipSponsor() {
 function showConfirmationPanel(sponsor, index) {
   removeConfirmationPanel();
 
-  const playerContainer = document.querySelector('.html5-video-container') ||
-                          document.querySelector('#movie_player') ||
-                          document.querySelector('ytd-player');
+  const playerContainer = document.querySelector('#movie_player') ||
+                          document.querySelector('ytd-player') ||
+                          document.querySelector('.html5-video-container');
 
   if (!playerContainer) return;
 
@@ -461,6 +512,11 @@ function showConfirmationPanel(sponsor, index) {
       <button class="yt-skip-btn-edit" data-action="edit">✗ No, editar</button>
     </div>
   `;
+
+  // Evitar que los clics e interacciones se propaguen al reproductor de YouTube
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  panel.addEventListener('mousedown', (e) => e.stopPropagation());
+  panel.addEventListener('mouseup', (e) => e.stopPropagation());
 
   playerContainer.appendChild(panel);
   state.confirmationPanel = panel;
@@ -490,9 +546,9 @@ function showConfirmationPanel(sponsor, index) {
 function showEditPanel(sponsor, index) {
   removeConfirmationPanel();
 
-  const playerContainer = document.querySelector('.html5-video-container') ||
-                          document.querySelector('#movie_player') ||
-                          document.querySelector('ytd-player');
+  const playerContainer = document.querySelector('#movie_player') ||
+                          document.querySelector('ytd-player') ||
+                          document.querySelector('.html5-video-container');
 
   if (!playerContainer) return;
 
@@ -515,6 +571,19 @@ function showEditPanel(sponsor, index) {
       <button class="yt-skip-btn-cancel" data-action="cancel">Cancelar</button>
     </div>
   `;
+
+  // Evitar que los clics se propaguen al reproductor de YouTube
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  panel.addEventListener('mousedown', (e) => e.stopPropagation());
+  panel.addEventListener('mouseup', (e) => e.stopPropagation());
+
+  // Evitar que las teclas pulsadas se propaguen al reproductor (evita pausar con espacio, buscar con números, etc.)
+  const inputs = panel.querySelectorAll('input');
+  inputs.forEach(input => {
+    input.addEventListener('keydown', (e) => e.stopPropagation());
+    input.addEventListener('keyup', (e) => e.stopPropagation());
+    input.addEventListener('keypress', (e) => e.stopPropagation());
+  });
 
   playerContainer.appendChild(panel);
   state.confirmationPanel = panel;
@@ -813,27 +882,36 @@ async function processVideo() {
   const cached = await getCachedSponsors(videoId);
   if (cached && cached.sponsors && cached.sponsors.length > 0) {
     console.log(`[YT-Skip] Video ya analizado, cargando desde cache`);
-    // Necesitamos la transcripción para el panel, intentar scrappear
     state.sponsors = cached.sponsors;
   }
 
   // Esperar a que el video cargue
   await waitForVideo();
 
+  // Si ya tenemos sponsors de caché, iniciar monitoreo inmediatamente
+  if (state.sponsors.length > 0) {
+    console.log(`[YT-Skip] Iniciando monitoreo inmediato con sponsors de caché`);
+    startVideoMonitor();
+  }
+
   // Agregar botón de transcripción
   addTranscriptButton();
 
   // Scrappear transcripción
   const transcript = await scrapeTranscript();
-  if (transcript.length === 0) return;
+  if (transcript.length === 0) {
+    // Si falló el scraping de transcripción pero ya tenemos sponsors de caché, al menos mostrar en el panel lo que tenemos
+    if (state.sponsors.length > 0) {
+      updateTranscriptPanel();
+    }
+    return;
+  }
 
   state.transcript = transcript;
 
-  // Si ya tenemos sponsors cacheados, usarlos
+  // Si ya tenemos sponsors cacheados y los estamos usando, solo actualizar el panel lateral
   if (cached && cached.sponsors && cached.sponsors.length > 0) {
-    state.sponsors = cached.sponsors;
     updateTranscriptPanel();
-    startVideoMonitor();
     return;
   }
 
@@ -845,8 +923,8 @@ async function processVideo() {
   await cacheSponsors(videoId, result);
   updateTranscriptPanel();
 
-  // Iniciar monitoreo del video
-  if (state.sponsors.length > 0) {
+  // Iniciar monitoreo del video si no se inició antes
+  if (state.sponsors.length > 0 && !state.monitorInterval) {
     startVideoMonitor();
   }
 }
