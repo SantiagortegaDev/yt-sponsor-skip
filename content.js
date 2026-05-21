@@ -190,14 +190,21 @@ async function scrapeTranscript() {
     console.log('[YT-Skip] Iniciando scraping de transcripción...');
 
     // Paso 1: Click en el botón "..." (más opciones) debajo del video
-    const moreButton = document.querySelector('#top-level-buttons-computed ytd-button-renderer:last-of-type button') ||
-                       document.querySelector('button[aria-label="More actions"]') ||
-                       document.querySelector('button[aria-label="Más acciones"]') ||
-                       document.querySelector('#menu button yt-icon-button button');
+    // YouTube cambia frecuentemente sus selectores, usamos múltiples fallbacks
+    const moreButton =
+      document.querySelector('#top-level-buttons-computed ytd-button-renderer:last-of-type button') ||
+      document.querySelector('button[aria-label="More actions"]') ||
+      document.querySelector('button[aria-label="Más acciones"]') ||
+      document.querySelector('#menu button yt-icon-button button') ||
+      document.querySelector('#top-level-buttons ytd-button-renderer:last-of-type button') ||
+      document.querySelector('ytd-menu-renderer button:last-of-type');
 
-    if (!moreButton) {
+    if (moreButton) {
+      moreButton.click();
+    } else {
       // Intentar buscar por el selector de los tres puntos
-      const actionMenu = document.querySelector('#top-level-buttons-computed');
+      const actionMenu = document.querySelector('#top-level-buttons-computed') ||
+                         document.querySelector('#top-level-buttons');
       if (actionMenu) {
         const buttons = actionMenu.querySelectorAll('button');
         if (buttons.length > 0) {
@@ -208,31 +215,47 @@ async function scrapeTranscript() {
       } else {
         throw new Error('No se encontró el menú de acciones');
       }
-    } else {
-      moreButton.click();
     }
 
     // Esperar a que el menú se abra
     await new Promise(r => setTimeout(r, 500));
 
     // Paso 2: Click en "Mostrar transcripción" / "Show transcript"
-    // Buscar por el atributo del ícono o por el texto del menú
-    const menuItems = document.querySelectorAll('ytd-menu-popup-renderer tp-yt-paper-listbox ytd-menu-service-item-renderer');
+    // Buscar por múltiples selectores y textos en varios idiomas
+    const menuItems = document.querySelectorAll(
+      'ytd-menu-popup-renderer tp-yt-paper-listbox ytd-menu-service-item-renderer, ' +
+      'ytd-menu-popup-renderer ytd-menu-service-item-renderer'
+    );
 
     let transcriptButton = null;
     for (const item of menuItems) {
       const text = item.textContent.trim().toLowerCase();
-      // Buscar por múltiples idiomas
+      // Buscar por múltiples idiomas y variantes
       if (text.includes('transcript') || text.includes('transcripción') ||
-          text.includes('transcrição') || text.includes('trascrizione')) {
+          text.includes('transcrição') || text.includes('trascrizione') ||
+          text.includes('transkript') || text.includes('transkription')) {
         transcriptButton = item;
         break;
       }
     }
 
     if (!transcriptButton) {
-      // Intentar buscar por selector más específico
-      transcriptButton = document.querySelector('ytd-menu-service-item-renderer[role="menuitem"]:last-of-type');
+      // Fallback: buscar por path del icono de transcripción
+      transcriptButton = document.querySelector(
+        'ytd-menu-service-item-renderer[role="menuitem"]:last-of-type'
+      );
+    }
+
+    if (!transcriptButton) {
+      // Fallback adicional: buscar por el path SVG del icono de transcripción
+      const allMenuItems = document.querySelectorAll('ytd-menu-service-item-renderer');
+      for (const item of allMenuItems) {
+        const path = item.querySelector('path[d*="M4"]'); // Icono de lista/transcripción
+        if (path) {
+          transcriptButton = item;
+          break;
+        }
+      }
     }
 
     if (!transcriptButton) {
@@ -710,31 +733,27 @@ function startVideoMonitor() {
 
     const currentTime = video.currentTime;
 
+    // Buscar si estamos dentro de algún segmento de sponsor
+    let activeSponsorIndex = -1;
     for (let i = 0; i < state.sponsors.length; i++) {
       const sponsor = state.sponsors[i];
-      // Rango de aparición: [start - 1, start + 3]
-      if (currentTime >= sponsor.start - 1 && currentTime <= sponsor.start + 3) {
-        if (!state.skipButton || parseInt(state.skipButton.dataset.sponsorIndex) !== i) {
-          showSkipButton(sponsor);
-          state.currentSponsorIndex = i;
-        }
-        return;
+      // Mostrar botón desde 1 segundo antes del inicio hasta el final del sponsor
+      if (currentTime >= sponsor.start - 1 && currentTime < sponsor.end) {
+        activeSponsorIndex = i;
+        break;
       }
     }
 
-    // Si estamos dentro de un sponsor pero ya pasamos el rango del botón, no mostrar nada
-    // Si pasamos completamente el sponsor, remover el botón
-    if (state.skipButton) {
-      const btnIndex = parseInt(state.skipButton.dataset.sponsorIndex);
-      const sponsor = state.sponsors[btnIndex];
-      if (sponsor && currentTime > sponsor.start + 3 && currentTime < sponsor.end) {
-        // Estamos dentro del sponsor pero ya pasó el rango del botón - no mostrar botón
-        // Dejamos el botón visible un poco más por si el usuario quiere saltar
+    if (activeSponsorIndex >= 0) {
+      // Mostrar el botón para este sponsor si no está ya visible
+      if (!state.skipButton || parseInt(state.skipButton.dataset.sponsorIndex) !== activeSponsorIndex) {
+        showSkipButton(state.sponsors[activeSponsorIndex]);
+        state.currentSponsorIndex = activeSponsorIndex;
       }
-      if (sponsor && currentTime >= sponsor.end) {
-        removeSkipButton();
-        state.currentSponsorIndex = -1;
-      }
+    } else if (state.skipButton) {
+      // Ya pasamos el rango del sponsor, remover el botón
+      removeSkipButton();
+      state.currentSponsorIndex = -1;
     }
   }, 500);
 }
