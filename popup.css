@@ -1,24 +1,17 @@
 /* ============================================================
    popup.css — Estilos del popup de YT Sponsor Skip
-   Inspirado en YouTube: fondo oscuro, texto blanco, acentos rojos
    ============================================================ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  width: 340px;
+  width: 380px;
   font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
   background: #0f0f0f;
   color: #f1f1f1;
 }
 
-.popup-container {
-  padding: 0;
-}
+.popup-container { padding: 0; }
 
 /* --- Header --- */
 .popup-header {
@@ -29,40 +22,19 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.popup-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.popup-logo { display: flex; align-items: center; gap: 8px; }
 
 .logo-icon {
-  background: #ff0000;
-  color: #fff;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
+  background: #ff0000; color: #fff; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px; font-size: 14px; font-weight: bold;
 }
 
-.logo-text {
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.3px;
-}
-
-.popup-version {
-  font-size: 11px;
-  color: #717171;
-}
+.logo-text { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
+.popup-version { font-size: 11px; color: #717171; }
 
 /* --- Body --- */
-.popup-body {
-  padding: 16px 20px;
-}
+.popup-body { padding: 16px 20px; }
 
 .popup-warning {
   background: rgba(255, 204, 0, 0.1);
@@ -75,137 +47,117 @@ body {
   margin-bottom: 18px;
 }
 
-.popup-section {
-  margin-bottom: 18px;
-}
+.popup-section { margin-bottom: 18px; }
 
-.popup-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: #aaa;
-  margin-bottom: 8px;
-}
+.popup-label { display: block; font-size: 13px; font-weight: 500; color: #aaa; margin-bottom: 8px; }
 
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+.input-wrapper { position: relative; display: flex; align-items: center; }
 
 .popup-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #f1f1f1;
-  padding: 10px 42px 10px 14px;
-  border-radius: 6px;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 13px;
-  transition: border-color 0.2s;
+  width: 100%; background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15); color: #f1f1f1;
+  padding: 10px 42px 10px 14px; border-radius: 6px;
+  font-family: 'Roboto Mono', monospace; font-size: 13px; transition: border-color 0.2s;
 }
 
-.popup-input:focus {
-  outline: none;
-  border-color: #ff0000;
-}
-
-.popup-input::placeholder {
-  color: #555;
-}
+.popup-input:focus { outline: none; border-color: #ff0000; }
+.popup-input::placeholder { color: #555; }
 
 .toggle-btn {
-  position: absolute;
-  right: 8px;
-  background: none;
-  border: none;
-  color: #aaa;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px;
-  transition: color 0.2s;
+  position: absolute; right: 8px; background: none; border: none;
+  color: #aaa; cursor: pointer; font-size: 16px; padding: 4px; transition: color 0.2s;
 }
 
-.toggle-btn:hover {
-  color: #fff;
-}
+.toggle-btn:hover { color: #fff; }
 
-.popup-status {
-  font-size: 12px;
-  margin-top: 6px;
-  padding-left: 2px;
-}
-
-.popup-status-ok {
-  color: #2dbd2d;
-}
-
-.popup-status-error {
-  color: #ff4444;
-}
+.popup-status { font-size: 12px; margin-top: 6px; padding-left: 2px; }
+.popup-status-ok { color: #2dbd2d; }
+.popup-status-error { color: #ff4444; }
 
 /* --- Actions --- */
-.popup-actions {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
+.popup-actions { display: flex; gap: 10px; margin-bottom: 14px; }
 
 .btn {
-  flex: 1;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
+  flex: 1; padding: 10px 16px; border: none; border-radius: 6px;
   font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
+  font-size: 13px; font-weight: 500; cursor: pointer;
   transition: background 0.2s, opacity 0.2s;
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.btn-primary {
-  background: #ff0000;
-  color: #fff;
-}
+.btn-primary { background: #ff0000; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #cc0000; }
 
-.btn-primary:hover:not(:disabled) {
-  background: #cc0000;
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f1f1f1;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-}
+.btn-secondary { background: rgba(255, 255, 255, 0.1); color: #f1f1f1; border: 1px solid rgba(255, 255, 255, 0.15); }
+.btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.2); }
 
 /* --- Test Result --- */
-.popup-test-result {
-  padding: 10px 14px;
-  border-radius: 6px;
+.popup-test-result { padding: 10px 14px; border-radius: 6px; font-size: 13px; line-height: 1.4; }
+.test-success { background: rgba(45, 189, 45, 0.1); border: 1px solid rgba(45, 189, 45, 0.3); color: #2dbd2d; }
+.test-error { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); color: #ff4444; }
+
+/* --- Logs Section --- */
+.popup-logs-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+}
+
+.popup-logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px 6px;
+}
+
+.popup-logs-title { font-size: 13px; font-weight: 500; color: #aaa; }
+
+.popup-logs-actions { display: flex; gap: 6px; }
+
+.btn-tiny {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #aaa;
   font-size: 13px;
-  line-height: 1.4;
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
 }
 
-.test-success {
-  background: rgba(45, 189, 45, 0.1);
-  border: 1px solid rgba(45, 189, 45, 0.3);
-  color: #2dbd2d;
+.btn-tiny:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+
+.popup-logs-container {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0 20px 10px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
 }
 
-.test-error {
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  color: #ff4444;
+.popup-logs-container::-webkit-scrollbar { width: 4px; }
+.popup-logs-container::-webkit-scrollbar-track { background: transparent; }
+.popup-logs-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 2px; }
+
+.popup-logs-empty { color: #555; text-align: center; padding: 12px 0; font-family: 'Roboto', sans-serif; font-size: 12px; }
+
+.popup-log-entry {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 1px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
+
+.log-ts { color: #555; min-width: 60px; flex-shrink: 0; }
+
+.log-level-info { color: #4a9eff; min-width: 38px; font-weight: 500; }
+.log-level-warn { color: #ffcc00; min-width: 38px; font-weight: 500; }
+.log-level-error { color: #ff4444; min-width: 38px; font-weight: 500; }
+.log-level-debug { color: #888; min-width: 38px; font-weight: 500; }
+
+.log-msg { color: #ccc; word-break: break-word; }
 
 /* --- Footer --- */
 .popup-footer {
@@ -215,6 +167,4 @@ body {
   color: #717171;
 }
 
-.popup-footer strong {
-  color: #aaa;
-}
+.popup-footer strong { color: #aaa; }

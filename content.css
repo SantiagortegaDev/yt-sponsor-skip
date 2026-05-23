@@ -1,6 +1,6 @@
 /* ============================================================
    content.css — Estilos para YT Sponsor Skip
-   Inspirado en el diseño de YouTube
+   El botón Skip Sponsor es idéntico al ytp-skip-ad-button nativo
    ============================================================ */
 
 /* --- Toast --- */
@@ -30,41 +30,53 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* --- Botón Skip Sponsor (estilo YouTube Skip Ad) --- */
-.yt-skip-sponsor-btn {
+/* --- Botón Skip Sponsor (idéntico al ytp-skip-ad-button de YouTube) --- */
+.yt-skip-sponsor-btn.ytp-skip-ad-button {
   position: absolute;
   bottom: 50px;
   right: 12px;
   z-index: 99999;
+  cursor: pointer;
+  animation: yt-skip-fade-in 0.3s ease forwards;
+  /* Los estilos vienen de la clase ytp-skip-ad-button nativa de YouTube.
+     Si YouTube no carga los estilos, aplicamos fallback: */
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: none;
   padding: 8px 16px;
   font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   border-radius: 4px;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  animation: yt-skip-fade-in 0.3s ease forwards;
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
-.yt-skip-sponsor-btn:hover {
-  background: rgba(255, 0, 0, 0.8);
-  border-color: rgba(255, 255, 255, 0.5);
+.yt-skip-sponsor-btn.ytp-skip-ad-button:hover {
+  background: rgba(255, 0, 0, 0.85);
+}
+
+.yt-skip-sponsor-btn .ytp-skip-ad-button__text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.yt-skip-sponsor-btn .ytp-skip-ad-button__icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.yt-skip-sponsor-btn .ytp-skip-ad-button__icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 @keyframes yt-skip-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Panel de Confirmación --- */
@@ -160,7 +172,7 @@
 .yt-skip-edit-field label {
   font-size: 13px;
   color: #aaa;
-  min-width: 120px;
+  min-width: 50px;
 }
 
 .yt-skip-time-input {
@@ -219,12 +231,8 @@
 }
 
 @keyframes yt-skip-slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
 }
 
 .yt-skip-panel-header {
@@ -293,18 +301,9 @@
   padding: 12px 0;
 }
 
-.yt-skip-panel-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.yt-skip-panel-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.yt-skip-panel-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
+.yt-skip-panel-content::-webkit-scrollbar { width: 6px; }
+.yt-skip-panel-content::-webkit-scrollbar-track { background: transparent; }
+.yt-skip-panel-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 3px; }
 
 .yt-skip-transcript-segment {
   padding: 6px 20px;
